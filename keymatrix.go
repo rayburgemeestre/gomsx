@@ -1,7 +1,6 @@
 package main
 
 import "github.com/pnegre/gogame"
-import "log"
 
 var keycodesData [][]int
 
@@ -53,7 +52,7 @@ func keyMatrix(row byte) (result byte) {
 			}
 		}
 	} else {
-		log.Fatalln("KeyMatrix: Tried to scan row > 10")
+		// log.Fatalln("KeyMatrix: Tried to scan row > 10")
 	}
 	return
 }

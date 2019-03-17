@@ -1,11 +1,18 @@
 package main
 
-import "github.com/pnegre/gogame"
+import (
+	"fmt"
+	"github.com/pnegre/gogame"
+	"path"
+)
+
+var (
+	WIN_W = 800
+	WIN_H = 600
+)
 
 const (
 	WINTITLE = "gomsx"
-	WIN_W    = 800
-	WIN_H    = 600
 	MSX_W1   = 320
 	MSX_W2   = 256
 	MSX_H    = 192
@@ -39,9 +46,10 @@ func init() {
 
 func graphics_init(quality bool) error {
 	var err error
-	if err = gogame.Init(WINTITLE, WIN_W, WIN_H); err != nil {
+	if err = gogame.InitXScreenSaver(WINTITLE); err != nil {
 		return err
 	}
+	WIN_W, WIN_H = gogame.GetWindowSize()
 	gogame.SetLogicalSize(WIN_W, WIN_H)
 	if quality {
 		gogame.SetScaleQuality(1)
@@ -77,6 +85,8 @@ func graphics_unlock() {
 func graphics_render() {
 	gogame.RenderClear()
 	graphics_ActiveTexture.Blit(0, 0)
+	// Show the currently loaded cart
+	font.RenderToScreenCenter(fmt.Sprintf("#%d - %s", index, path.Base(cart)), WIN_W/2, WIN_H-20, gogame.COLOR_WHITE)
 	gogame.RenderPresent()
 }
 
@@ -96,5 +106,5 @@ func graphics_setLogicalResolution(scrMode int) {
 		graphics_ActiveTexture = graphics_tex256
 		return
 	}
-	panic("setLogicalResolution: mode not supported")
+	// panic("setLogicalResolution: mode not supported")
 }

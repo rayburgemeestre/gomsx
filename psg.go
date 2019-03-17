@@ -59,13 +59,15 @@ func (psg *PSG) writePort(ad byte, val byte) {
 
 	case ad == 0xa1:
 		// Write value to port
-		psg.regs[psg.regNext] = val
-		if psg.regNext < 14 {
-			for i := 0; i < 3; i++ {
-				psg.doTones(i)
-			}
+		if int(psg.regNext) < len(psg.regs) {
+			psg.regs[psg.regNext] = val
+			if psg.regNext < 14 {
+				for i := 0; i < 3; i++ {
+					psg.doTones(i)
+				}
 
-			// TODO: sound_doNoises()
+				// TODO: sound_doNoises()
+			}
 		}
 		return
 	}
@@ -88,7 +90,11 @@ func (psg *PSG) readPort(ad byte) byte {
 			// TODO: millorar
 			return 0
 		}
-		return psg.regs[psg.regNext]
+		if psg.regNext < 16 {
+			return psg.regs[psg.regNext]
+		} else {
+			return 0
+		}
 	}
 
 	log.Fatalf("Sound, not implemented: in(%02x)", ad)

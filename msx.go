@@ -16,25 +16,30 @@ type MSX struct {
 	psg    *PSG
 }
 
-func (msx *MSX) mainLoop(frameInterval int) float64 {
+func (msx *MSX) mainLoop(frameInterval int) (bool, float64) {
 	log.Println("Beginning simulation...")
 	state_init()
 	var currentTime, elapsedTime, lag int64
 	updateInterval := int64(time.Millisecond) * int64(frameInterval)
+	// For testing purposes: super fast execution
+	// updateInterval = int64(time.Millisecond)
 	previousTime := time.Now().UnixNano()
 
-	startTime := time.Now().UnixNano()
+	beginTime := time.Now()
+	startTime := beginTime.UnixNano()
 	nframes := 0
-	paused := false
+	gogame.SetFullScreen(true)
 	for {
 		currentTime = time.Now().UnixNano()
 		elapsedTime = currentTime - previousTime
+		// Exit the mainLoop every minute, so our caller can load a new random cartridge.
+		if time.Now().Sub(beginTime) > time.Minute {
+			return false, 0
+		}
 		previousTime = currentTime
 		lag += elapsedTime
 		for lag >= updateInterval {
-			if !paused {
-				msx.cpuFrame()
-			}
+			msx.cpuFrame()
 			lag -= updateInterval
 		}
 
@@ -47,25 +52,10 @@ func (msx *MSX) mainLoop(frameInterval int) float64 {
 		graphics_unlock()
 		graphics_render()
 
-		if !paused {
-			if nframes%(60*2) == 0 {
-				state_save(msx)
-			}
-		}
-
-		if gogame.IsKeyPressed(gogame.K_F12) {
-			state_revert(msx)
-			paused = true
-		}
-
-		if gogame.IsKeyPressed(gogame.K_SPACE) {
-			paused = false
-		}
-
 		nframes++
 	}
 	delta := (time.Now().UnixNano() - startTime) / int64(time.Second)
-	return float64(nframes) / float64(delta)
+	return true, float64(nframes) / float64(delta)
 }
 
 func (msx *MSX) cpuFrame() {

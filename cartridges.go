@@ -54,9 +54,15 @@ func NewMapperKonami4(data []byte) Mapper {
 func (self *MapperKonami4) readByte(address uint16) byte {
 	address -= 0x4000
 	place := address / 0x2000
-	realMem := self.contents[self.sels[place]*0x2000:]
-	delta := address - 0x2000*place
-	return realMem[delta]
+	if place >= 0 && place < 4 {
+		index := self.sels[place] * 0x2000
+		if index < len(self.contents) {
+			realMem := self.contents[self.sels[place]*0x2000:]
+			delta := address - 0x2000*place
+			return realMem[delta]
+		}
+	}
+	return 0
 }
 
 func (self *MapperKonami4) writeByte(address uint16, value byte) {

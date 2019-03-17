@@ -107,7 +107,7 @@ func (self *Memory) loadRom(fname string, slot int) {
 		self.load(buffer[0x8000:], 2, slot)
 		self.load(buffer[0xC000:], 3, slot)
 	default:
-		panic("ROM size not supported")
+		// panic("ROM size not supported")
 	}
 
 }

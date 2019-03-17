@@ -84,11 +84,13 @@ func (vdp *Vdp) writePort(ad byte, val byte) {
 			vdp.writeState = 0
 			// Bit 7 must be 1 for write
 			if val&0x80 != 0 {
-				regn := val - 128
-				// log.Printf("vdp[%d] = %02x\n", regn, vdp.valueRead)
-				vdp.registers[regn] = vdp.valueRead
-				// log.Printf("VDPS: %v\n", vdp.registers)
-				vdp.updateRegisters()
+				if val-128 < 10 {
+					regn := val - 128
+					// log.Printf("vdp[%d] = %02x\n", regn, vdp.valueRead)
+					vdp.registers[regn] = vdp.valueRead
+					// log.Printf("VDPS: %v\n", vdp.registers)
+					vdp.updateRegisters()
+				}
 				return
 			} else {
 				vdp.writeToVRAM = (val&0x40 != 0)

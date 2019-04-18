@@ -22,7 +22,10 @@ func (msx *MSX) mainLoop(frameInterval int) (bool, float64) {
 	var currentTime, elapsedTime, lag int64
 	updateInterval := int64(time.Millisecond) * int64(frameInterval)
 	// For testing purposes: super fast execution
-	// updateInterval = int64(time.Millisecond)
+	//updateInterval = int64(time.Millisecond)
+
+	// Four times as fast
+	updateInterval /= 4
 	previousTime := time.Now().UnixNano()
 
 	beginTime := time.Now()
@@ -33,7 +36,7 @@ func (msx *MSX) mainLoop(frameInterval int) (bool, float64) {
 		currentTime = time.Now().UnixNano()
 		elapsedTime = currentTime - previousTime
 		// Exit the mainLoop every minute, so our caller can load a new random cartridge.
-		if time.Now().Sub(beginTime) > time.Minute {
+		if time.Now().Sub(beginTime) > time.Second * 10 {
 			return false, 0
 		}
 		previousTime = currentTime

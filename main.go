@@ -8,9 +8,12 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"os/exec"
+	"os/signal"
 	"os/user"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/pnegre/gomsx/z80"
@@ -51,7 +54,46 @@ func forEachLineInFile(filename string, callback func(string) bool) {
 	}
 }
 
+var lastProcess *os.Process
+
 func main() {
+	sigs := make(chan os.Signal, 1)
+
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		sig := <-sigs
+		fmt.Println("Received signal: ", sig, " killing child process now..")
+		fmt.Println("Which has PID: ", lastProcess.Pid)
+		_ = lastProcess.Kill()
+		os.Exit(0)
+	}()
+
+	// Sometimes, especially with a multi-monitor setup the MSX emulator can crash, at least on my laptop
+	// Unfortunately XScreensaver won't automatically restart it, so we build this workaround. Infinitely restart :)
+	if os.Getenv("MSX_STARTED_SUBPROCESS") == "" {
+		for {
+			executable, err := os.Executable()
+			if err != nil {
+				panic(err.Error())
+			}
+			cmd := exec.Command(executable)
+			cmd.Env = append(os.Environ(), "MSX_STARTED_SUBPROCESS=true")
+
+			// Make sure when this process is killed, our spawned child is as well!
+			//cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+			if err := cmd.Start(); err != nil {
+				// This is fine!
+				log.Println(err)
+				continue
+			}
+			lastProcess = cmd.Process
+			if err := cmd.Wait(); err != nil {
+				// This is fine!
+				log.Println(err)
+			}
+		}
+	}
+
 	// Random game selection (sequential is handy when testing lots of roms)
 	random = true
 
@@ -67,9 +109,6 @@ func main() {
 
 	// Use XML Database from our .msxsaver dir.
 	XMLDATABASE = fmt.Sprintf("%s/.msxsaver/softwaredb.xml", homedir)
-
-	// Load font to print current cartridge on screen
-	font = gogame.NewFont(fmt.Sprintf("%s/.msxsaver/Monaco_Linux-Powerline.ttf", homedir), 16)
 
 	// Load all the known to be working games
 	var games []string
@@ -146,6 +185,10 @@ func main() {
 			if errg := graphics_init(quality); errg != nil {
 				log.Fatalf("Error initalizing graphics: %v", errg.Error())
 			}
+
+			// Load font to print current cartridge on screen
+			font = gogame.NewFont(fmt.Sprintf("%s/.msxsaver/Monaco_Linux-Powerline.ttf", homedir), 16)
+
 			initializeGraphics = false
 		}
 

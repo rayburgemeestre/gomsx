@@ -61,9 +61,7 @@ func main() {
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
-		sig := <-sigs
-		fmt.Println("Received signal: ", sig, " killing child process now..")
-		fmt.Println("Which has PID: ", lastProcess.Pid)
+		<-sigs
 		_ = lastProcess.Kill()
 		os.Exit(0)
 	}()
@@ -104,19 +102,24 @@ func main() {
 	}
 	homedir := u.HomeDir
 
-	// Use Panasonic MSX1 CF-2700 ROM
-	SYSTEMROMFILE = fmt.Sprintf("%s/.msxsaver/cf-2700_basic-bios1.rom", homedir)
+	msxFilesPath := fmt.Sprintf("%s/.msxsaver", homedir)
+	if _, err := os.Stat(msxFilesPath); os.IsNotExist(err) {
+		msxFilesPath = "/usr/share/msxsaver"
+	}
 
-	// Use XML Database from our .msxsaver dir.
-	XMLDATABASE = fmt.Sprintf("%s/.msxsaver/softwaredb.xml", homedir)
+	// Use Panasonic MSX1 CF-2700 ROM
+	SYSTEMROMFILE = fmt.Sprintf("%s/cf-2700_basic-bios1.rom", msxFilesPath)
+
+	// Use XML Database
+	XMLDATABASE = fmt.Sprintf("%s/softwaredb.xml", msxFilesPath)
 
 	// Load all the known to be working games
 	var games []string
-	forEachLineInFile(fmt.Sprintf("%s/.msxsaver/games.txt", homedir), func(game string) bool {
+	forEachLineInFile(fmt.Sprintf("%s/games.txt", msxFilesPath), func(game string) bool {
 		if len(game) == 0 || strings.Contains(game, "//") {
 			return true
 		}
-		games = append(games, fmt.Sprintf("%s/.msxsaver/roms/%s", homedir, game))
+		games = append(games, fmt.Sprintf("%s/roms/%s", msxFilesPath, game))
 		return true
 	})
 
@@ -187,7 +190,7 @@ func main() {
 			}
 
 			// Load font to print current cartridge on screen
-			font = gogame.NewFont(fmt.Sprintf("%s/.msxsaver/Monaco_Linux-Powerline.ttf", homedir), 16)
+			font = gogame.NewFont(fmt.Sprintf("%s/Monaco_Linux-Powerline.ttf", msxFilesPath), 16)
 
 			initializeGraphics = false
 		}

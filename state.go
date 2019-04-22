@@ -1,7 +1,7 @@
 package main
 
 import "container/ring"
-import "github.com/pnegre/gomsx/z80"
+import "github.com/rayburgemeestre/gomsx/z80"
 
 type stateDataT struct {
 	cpuBackup *z80.Z80

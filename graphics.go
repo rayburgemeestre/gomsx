@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/pnegre/gogame"
+	"github.com/rayburgemeestre/gogame"
 	"path"
 )
 

@@ -48,12 +48,12 @@ Go needs to have its workspace set up. Look for the documentation in https://gol
 
 Next, get the source and the dependencies:
 
-    $ go get github.com/pnegre/gogame
-    $ go get github.com/pnegre/gomsx
+    $ go get github.com/rayburgemeestre/gogame
+    $ go get github.com/rayburgemeestre/gomsx
 
 And, you just build the program:
 
-    $ cd yourgoworkspace/src/github.com/pnegre/gomsx
+    $ cd yourgoworkspace/src/github.com/rayburgemeestre/gomsx
     $ go build
 
 Happy hacking!!!

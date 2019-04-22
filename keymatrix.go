@@ -1,6 +1,6 @@
 package main
 
-import "github.com/pnegre/gogame"
+import "github.com/rayburgemeestre/gogame"
 
 var keycodesData [][]int
 

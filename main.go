@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/pnegre/gogame"
+	"github.com/rayburgemeestre/gogame"
 	"log"
 	"math/rand"
 	"os"
@@ -16,7 +16,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/pnegre/gomsx/z80"
+	"github.com/rayburgemeestre/gomsx/z80"
 )
 
 var (

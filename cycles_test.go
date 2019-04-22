@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/pnegre/gomsx/z80"
+	"github.com/rayburgemeestre/gomsx/z80"
 )
 
 func Test1(t *testing.T) {

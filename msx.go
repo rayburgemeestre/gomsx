@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/pnegre/gogame"
-	"github.com/pnegre/gomsx/z80"
+	"github.com/rayburgemeestre/gogame"
+	"github.com/rayburgemeestre/gomsx/z80"
 )
 
 type MSX struct {

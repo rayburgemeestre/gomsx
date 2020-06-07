@@ -36,7 +36,7 @@ func (msx *MSX) mainLoop(frameInterval int) (bool, float64) {
 		currentTime = time.Now().UnixNano()
 		elapsedTime = currentTime - previousTime
 		// Exit the mainLoop every minute, so our caller can load a new random cartridge.
-		if time.Now().Sub(beginTime) > time.Second * 10 {
+		if time.Now().Sub(beginTime) > time.Second*10 {
 			return false, 0
 		}
 		previousTime = currentTime
@@ -56,6 +56,9 @@ func (msx *MSX) mainLoop(frameInterval int) (bool, float64) {
 		graphics_render()
 
 		nframes++
+
+		// let's dial back the GPU or CPU usage when the screensaver is active
+		time.Sleep(20 * time.Millisecond)
 	}
 	delta := (time.Now().UnixNano() - startTime) / int64(time.Second)
 	return true, float64(nframes) / float64(delta)
